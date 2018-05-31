@@ -12,6 +12,8 @@ KEYPRAMETER="/C=GB/ST=London/L=London/O=Global Security/OU=IT Department/CN=$DOM
 LOCALIP=127.0.0.1
 PUBLICKIP=165.227.63.216
 
+#openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout $KEYPATH -out $CERTPATH -subj "/C=GB/ST=London/L=London/O=Global Security/OU=IT Department/CN=$DOMAIN_NAME"
+
 # Prosody
 
 apt-get install prosody
@@ -58,7 +60,7 @@ err=$?
 if [ "${err}" -ne 0 ]; then exit "${err}"; fi
 
 #openSSL
-openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout $KEYPATH -out $CERTPATH -subj $KEYPRAMETER 
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout $KEYPATH -out $CERTPATH -subj "/C=GB/ST=London/L=London/O=Global Security/OU=IT Department/CN=$DOMAIN_NAME" 
 
 
 #  NGINX
