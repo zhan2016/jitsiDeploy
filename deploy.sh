@@ -43,12 +43,17 @@ EndOfText
 
 mkdir -p /etc/prosody/conf.avail && cp $DOMAIN_NAME.cfg.lua /etc/prosody/conf.avail/
 ln -s /etc/prosody/conf.avail/$DOMAIN_NAME.cfg.lua /etc/prosody/conf.d/$DOMAIN_NAME.cfg.lua
-prosodyctl cert generate  $DOMAIN_NAME
-prosodyctl cert generate auth.$DOMAIN_NAME
+#prosodyctl cert generate  $DOMAIN_NAME
+#prosodyctl cert generate auth.$DOMAIN_NAME
+openssl req -new -x509 -days 365 -nodes -out  "/var/lib/prosody/$DOMAIN_NAME.crt" -newkey rsa:2048 -keyout  "/var/lib/prosody/$DOMAIN_NAME.key" -subj "/C=GB/ST=London/L=London/O=Global Security/OU=IT Department/CN=$DOMAIN_NAME"
+openssl req -new -x509 -days 365 -nodes -out "/var/lib/prosody/auth.$DOMAIN_NAME.crt" -newkey rsa:2048 -keyout "/var/lib/prosody/auth.$DOMAIN_NAME.key" -subj "/C=GB/ST=London/L=London/O=Global Security/OU=IT Department/CN=auth.$DOMAIN_NAME"
+
+
 ln -sf /var/lib/prosody/auth.$DOMAIN_NAME.crt /usr/local/share/ca-certificates/auth.$DOMAIN_NAME.crt
 update-ca-certificates -f
 prosodyctl register focus auth.$DOMAIN_NAME $YOURSECRET3
 prosodyctl restart
+
 err=$?
 if [ "${err}" -ne 0 ]; then exit "${err}"; fi
 
@@ -96,7 +101,7 @@ if [ "${err}" -ne 0 ]; then exit "${err}"; fi
 
 # Videobridge & jicofo
 
-apt-get install default-jre
+#apt-get install default-jre
 
 mkdir -p /opt && cp -r jitsi-videobridge /opt/ && cp -r jicofo /opt/
 
@@ -113,5 +118,5 @@ rm $DOMAIN_NAME.cfg.lua $DOMAIN_NAME sip-communicator.properties
 # Run
 
 /opt/jitsi-videobridge/jvb.sh --host=localhost --domain=$DOMAIN_NAME  --port=5347 --secret=$YOURSECRET1 &
-/opt/jicofo/jicofo.sh --domain=$DOMAIN_NAME --secret=$YOURSECRET2 --user_domain=auth.$DOMAIN_NAME --user_name=focus --user_password=$YOURSECRET3 &
+/opt/jicofo/jicofo.sh --host=localhost --domain=$DOMAIN_NAME --secret=$YOURSECRET2 --user_domain=auth.$DOMAIN_NAME --user_name=focus --user_password=$YOURSECRET3 &
 
